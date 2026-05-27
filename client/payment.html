@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento - Stadio Giuseppe Meazza</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="/logos/inter.png" alt="Inter Milan">
+                <span>Sezione Pagamento</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- TIMER FLUTTUANTE IN ALTO A DESTRA - STILE BLU (LUXURY) -->
+    <div id="timerFloat" style="position: fixed; top: 80px; right: 20px; z-index: 1000; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 20px; padding: 18px 24px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,169,126,0.3) inset; min-width: 200px; backdrop-filter: blur(10px); display: none;">
+        <div style="font-size: 32px; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">⏳</div>
+        <div style="font-size: 12px; color: #c8a97e; margin-bottom: 6px; font-weight: 500;">Tempo rimanente per completare il pagamento:</div>
+        <div id="countdownFloat" style="font-size: 36px; font-weight: 700; color: #f0ede8; font-family: 'DM Mono', 'Courier New', monospace; letter-spacing: 4px; background: rgba(0,0,0,0.4); padding: 6px 16px; border-radius: 50px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: inline-block;">10:00</div>
+    </div>
+
+    <!-- SEZIONE TELEGRAM - SOTTO IL TIMER -->
+    <div id="telegramBanner" style="position: fixed; top: 280px; right: 20px; z-index: 1000; background: var(--bg-1); border-radius: 20px; padding: 18px 20px; min-width: 240px; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <div style="text-align: center; margin-bottom: 12px;">
+            <span style="font-size: 14px; font-weight: 600; margin-left: 8px; color: var(--text-1);">Ricevi la conferma su Telegram</span>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <!-- QR Code -->
+            <div id="telegramQrCode" style="width: 80px; height: 80px; flex-shrink: 0;"></div>
+            
+            <!-- Istruzioni -->
+            <div style="flex: 1;">
+                <div style="font-size: 12px; margin-bottom: 8px; color: var(--text-1);">
+                    1️⃣ Apri <strong>@StadioMeazzaBot</strong>
+                </div>
+                <div style="font-size: 12px; margin-bottom: 8px; color: var(--text-1);">
+                    2️⃣ Invia: <code style="background: var(--bg-2); padding: 4px 8px; border-radius: 6px; font-size: 12px;">/connect <span id="telegramUserId">---</span></code>
+                </div>
+                <div style="font-size: 11px; color: var(--text-2);">
+                    ✅ Conferma automatica dopo il pagamento
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-container">
+        <div class="payment-card">
+            <h2>Completa il Pagamento</h2>
+
+            <div class="booking-summary">
+                <h3>Riepilogo Prenotazione</h3>
+                <div id="bookingDetails"></div>
+                <div class="discount-section">
+                    <label for="discountCode">Codice Sconto:</label>
+                    <input type="text" id="discountCode" placeholder="Inserisci codice promo">
+                    <button type="button" id="applyDiscountBtn">Applica</button>
+                    <div id="discountMessage" style="font-size:12px; margin-top:5px;"></div>
+                </div>
+                <div class="total-amount">
+                    <strong>Totale:</strong>
+                    <span id="totalAmount"></span>
+                </div>
+            </div>
+
+            <!-- ============ SEZIONE INTESTATARI BIGLIETTI ============ -->
+            <div class="ticket-holders-section" style="margin-top: 25px; padding: 15px; background: var(--surface); border-radius: var(--radius-lg);">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">Intestatari biglietti</h3>
+                <div id="ticketHoldersContainer">
+                    <!-- I campi verranno generati dinamicamente in base al numero di posti -->
+                </div>
+            </div>
+            <!-- ======================================================= -->
+
+            <form id="paymentForm">
+                <div class="payment-methods">
+                    <h3>Metodo di Pagamento</h3>
+                    <div class="payment-option">
+                        <input type="radio" id="creditCard" name="paymentMethod" value="credit_card" checked>
+                        <label for="creditCard">Carta di Credito</label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="paypal" name="paymentMethod" value="paypal">
+                        <label for="paypal">PayPal</label>
+                    </div>
+                </div>
+
+                <div id="creditCardForm" class="card-details">
+                    <div class="form-group">
+                        <label for="cardNumber">Numero Carta</label>
+                        <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expiryDate">Data Scadenza</label>
+                            <input type="text" id="expiryDate" placeholder="MM/YY">
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV</label>
+                            <input type="text" id="cvv" placeholder="123">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardName">Intestatario Carta</label>
+                        <input type="text" id="cardName" placeholder="Mario Rossi">
+                    </div>
+                </div>
+
+                <div id="paypalForm" style="display:none;">
+                    <div class="form-group">
+                        <label for="paypalEmail">Email</label>
+                        <input type="email" id="paypalEmail" placeholder="tuo@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="paypalPassword">Password</label>
+                        <input type="password" id="paypalPassword" placeholder="********">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-pay">Paga Ora</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="payment.js"></script>
+</body>
+</html>

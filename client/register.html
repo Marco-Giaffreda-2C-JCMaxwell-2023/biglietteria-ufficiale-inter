@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrazione - Inter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="/logos/inter.png" alt="Inter Milan">
+                <h2>Crea account</h2>
+                <p>Unisciti a noi e vivi l'emozione del match</p>
+            </div>
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Conferma password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn-auth">Registrati</button>
+            </form>
+            <div class="auth-footer">
+                <p>Hai già un account? <a href="login.html">Accedi</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Funzione per mostrare errori
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            errorDiv.style.cssText = `
+                background: #f44336;
+                color: white;
+                padding: 10px;
+                border-radius: 8px;
+                margin-top: 10px;
+                text-align: center;
+            `;
+            const form = document.querySelector('form');
+            form.insertBefore(errorDiv, form.firstChild);
+            setTimeout(() => errorDiv.remove(), 3000);
+        }
+        
+        // Gestione registrazione
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validazione password lato client
+            if (password.length < 6) {
+                showError('La password deve essere di almeno 6 caratteri');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('Le password non corrispondono');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = 'login.html';
+                } else {
+                    showError(data.message);
+                }
+            } catch (error) {
+                showError('Errore di connessione. Riprova.');
+            }
+        });
+    </script>
+</body>
+</html>

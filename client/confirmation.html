@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conferma Prenotazione - Stadio Giuseppe Meazza</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="/logos/inter.png" alt="Inter Milan">
+                <span>Riepilogo Prenotazione</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="confirmation-container">
+        <div class="confirmation-card">
+            <div class="success-icon">✓</div>
+            <h1>Prenotazione Confermata!</h1>
+            <p>I tuoi biglietti sono stati prenotati con successo.</p>
+            <div class="booking-code">
+                <strong>Codice Prenotazione:</strong>
+                <span id="bookingCode"></span>
+            </div>
+
+            <div class="ticket-details" id="ticketDetails"></div>
+
+            <div class="actions">
+    <a href="index.html" class="btn-primary">Torna alla mappa</a>
+    <button onclick="window.print()" class="btn-secondary">Stampa Biglietti</button>
+        </div>
+    </div>
+
+    <script src="confirmation.js"></script>
+</body>
+</html>

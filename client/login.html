@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Inter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="/logos/inter.png" alt="Inter Milan">
+                <h2>Benvenuto</h2>
+                <p>Accedi per prenotare i tuoi biglietti</p>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+    <label for="password">Password</label>
+    <div style="position: relative;">
+        <input type="password" id="password" name="password" required style="width: 100%; padding-right: 40px;">
+        <span id="togglePassword" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none;">👁️</span>
+    </div>
+</div>
+                <button type="submit" class="btn-auth">Accedi</button>
+            </form>
+            <div style="text-align: center; margin-top: 15px;">
+    <a href="forgot-password.html" style="color: #667eea; text-decoration: none; font-size: 14px;">Password dimenticata?</a>
+</div>
+            <div class="auth-footer">
+                <p>Non hai un account? <a href="register.html">Registrati</a></p>
+            </div>
+        </div>
+    </div>
+    <script src="auth.js"></script>
+    <script>
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.textContent = type === 'password' ? '👁️' : '🙈';
+    });
+</script>
+</body>
+</html>

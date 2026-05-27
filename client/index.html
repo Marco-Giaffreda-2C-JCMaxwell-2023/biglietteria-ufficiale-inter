@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inter - Biglietteria Ufficiale</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <img src="/logos/inter.png" alt="Inter Milan">
+                    <span> Biglietteria Ufficiale</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html" class="active">Mappa stadio</a>
+                    <a href="#" id="myBookingsLink">Le mie prenotazioni</a>
+                    <a href="admin.html" id="adminLink" style="display: none;">Area riservata</a>
+                    <div class="user-info" id="userInfo">
+                        <span id="usernameDisplay"></span>
+                        <button id="logoutBtn" class="btn-logout">Esci</button>
+                        <button id="themeToggle" class="btn-theme" style="background: transparent; border: none; font-size: 20px; cursor: pointer;">🌙</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-container">
+            <div class="event-info">
+                <div class="event-card">
+                    <!-- Riga con loghi: Scudetto e Coppa Italia a sinistra, Logo Serie A a destra -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <!-- Scudetto e Coppa Italia a SINISTRA -->
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <img src="/images/scudetto.png" alt="Scudetto" style="height: 90px;" title="Campioni d'Italia 2025/26">
+                            <img src="/images/coppa_italia.png" alt="Coppa Italia" style="height: 90px;" title="Coppa Italia 2025/26">
+                        </div>
+                        
+                        <!-- Titolo al CENTRO -->
+                        <div style="text-align: center;">
+                            <h1 style="margin: 0; font-size: 28px;">Serie A Enilive 2025/2026</h1>
+                        </div>
+                        
+                        <!-- Logo Serie A a DESTRA (cliccabile) - STESSA ALTEZZA 90px -->
+                        <a href="https://www.legaseriea.it/serie-a" target="_blank" style="text-decoration: none;">
+                            <img src="/images/serie-a-logo.png" alt="Serie A"
+                                style="height: 90px; transition: transform 0.2s;"
+                                onmouseover="this.style.transform='scale(1.05)'"
+                                onmouseout="this.style.transform='scale(1)'">
+                        </a>
+                    </div>
+
+                    <div class="selector-container" style="margin-top: 15px;">
+                        <label for="matchSelect">Seleziona Partita:</label>
+                        <select id="matchSelect" class="match-select">
+                            <option value="">Caricamento partite...</option>
+                        </select>
+                    </div>
+                    <div id="matchDetails" class="match-details">
+                        <div class="teams">
+                            <div class="team home">
+                                <img src="/logos/inter.png" alt="Inter"
+                                    style="width: 80px; height: 80px; object-fit: contain; display: block; margin: 0 auto;">
+                                <span style="display: block; text-align: center; margin-top: 8px;">Inter</span>
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team away">
+                                <img id="awayTeamLogo" src="" alt="Opponent"
+                                    style="width: 80px; height: 80px; object-fit: contain; display: block; margin: 0 auto;">
+                                <span id="awayTeamName"
+                                    style="display: block; text-align: center; margin-top: 8px;">Seleziona
+                                    partita</span>
+                            </div>
+                        </div>
+                        <div class="event-details">
+                            <span class="date" id="matchDate">--</span>
+                            <span class="time" id="matchTime"> --</span>
+                            <span class="stadium">Stadio Giuseppe Meazza, Milano</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-container">
+                    <div class="stadium-map">
+                        <div class="map-header">
+                            <h2>Seleziona il tuo posto</h2>
+                            <div class="legend">
+                                <div class="legend-item"><span class="color available"></span> Disponibile</div>
+                                <div class="legend-item"><span class="color locked"></span> Bloccato</div>
+                                <div class="legend-item"><span class="color booked"></span> Prenotato</div>
+                                <div class="legend-item"><span class="color selected"></span> Selezionato</div>
+                            </div>
+                        </div>
+                        <div class="pitch-view" style="background: transparent; padding: 0;">
+                            <img src="/images/stadio.png" alt="Mappa Stadio San Siro"
+                                style="width: 100%; border-radius: 10px;">
+                        </div>
+                        <div class="seats-container" id="seatsContainer">
+                            <div class="loading">Seleziona una partita per vedere i posti</div>
+                        </div>
+                    </div>
+
+                    <div class="booking-sidebar">
+                        <div class="selected-seats">
+                            <h3>La tua selezione</h3>
+                            <div id="selectedSeatsList" class="seats-list">
+                                <p class="empty-message">Nessun posto selezionato</p>
+                            </div>
+                            <div class="total-price">
+                                <span>Totale:</span>
+                                <span id="totalPrice">€0</span>
+                            </div>
+                            <button id="proceedToPayment" class="btn-proceed" disabled>Procedi al Pagamento</button>
+                        </div>
+                        <div class="timer" id="timer" style="display: none;">
+                            <div class="timer-icon">⏱️</div>
+                            <div class="timer-text">Tempo rimanente per completare il pagamento:</div>
+                            <div class="timer-countdown" id="countdown">10:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="app.js"></script>
+       <!-- ============ FOOTER ============ -->
+<footer class="footer" style="margin-top: 60px; padding: 40px 20px 20px; background: var(--bg-1); border-top: 1px solid var(--border);">
+    <div class="footer-container" style="max-width: 1440px; margin: 0 auto;">
+        
+       <!-- Sponsor fissi centrati -->
+<div style="display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; margin-bottom: 30px; padding: 10px 0; border-bottom: 1px solid var(--border);">
+    <a href="https://www.qatarairways.com" target="_blank">
+        <img id="qatarLogo" src="/images/qatar.webp" alt="Qatar Airways" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    </a>
+    <a href="https://www.nike.com/it/" target="_blank">
+        <img id="nikeLogo" src="/images/nike-white.png" alt="Nike" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    </a>
+    <a href="https://www.pirelli.com" target="_blank">
+        <img id="pirelliLogo" src="/images/pirelli-white.webp" alt="Pirelli" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    </a>
+    <a href="https://www.konami.com" target="_blank">
+        <img id="efootball" src="/images/konami-sponsor.webp" alt="Efootball" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    </a>
+    <a href="https://betsson.sport/" target="_blank">
+        <img id="betssonLogo" src="/images/betsson.webp" alt="Betsson Sport" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    </a>
+    <a href="https://www.byd.com/it" target="_blank">
+    <img id="bydLogo" src="/images/byd.webp" alt="BYD" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+</a>
+ <a href="https://www.cocacola.it" target="_blank">
+    <img id="cocacola" src="/images/coca.webp" alt="BYD" style="height: 40px; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+</a>
+</div>
+
+        </div>
+        
+        <!-- Righe informative -->
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 30px; margin-bottom: 30px;">
+            
+            <!-- Colonna 1: Info società -->
+            <div style="flex: 1; min-width: 200px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <img src="/logos/inter.png" alt="Inter Milan" style="height: 35px; width: auto;">
+                    <h3 style="color: var(--accent); margin: 0; font-size: 18px;">FC Internazionale Milano</h3>
+                </div>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">Copyright © 1995 — 2026 F.C. Internazionale Milano</p>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">P.IVA 04231750151</p>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">Codice Fiscale 04231750151</p>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">AS2 2015.4.1710</p>
+            </div>
+            
+            <!-- Colonna 2: Contatti -->
+            <div style="flex: 1; min-width: 200px;">
+                <h3 style="color: var(--accent); margin-bottom: 15px; font-size: 18px;">Contatti</h3>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">Stadio Giuseppe Meazza, Milano</p>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">biglietteria@inter.it</p>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">+39 02 1234567</p>
+                <p style="color: var(--text-2); margin: 5px 0; font-size: 13px;">Lun-Ven 9:00-18:00</p>
+            </div>
+            
+            <!-- Colonna 3: Social Media -->
+            <div style="flex: 1; min-width: 200px;">
+                <h3 style="color: var(--accent); margin-bottom: 15px; font-size: 18px;">Seguici</h3>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="https://www.instagram.com/inter/?hl=it" target="_blank" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">Instagram</a>
+                    <a href="https://www.facebook.com/inter" target="_blank" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">Facebook</a>
+                    <a href="https://twitter.com/inter" target="_blank" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">Twitter</a>
+                    <a href="https://www.youtube.com/inter" target="_blank" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">YouTube</a>
+                    <a href="https://www.tiktok.com/@inter" target="_blank" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">TikTok</a>
+                </div>
+            </div>
+            
+            <!-- Colonna 4: Link utili -->
+            <div style="flex: 1; min-width: 200px;">
+                <h3 style="color: var(--accent); margin-bottom: 15px; font-size: 18px;">Link utili</h3>
+                <p><a href="#" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">Privacy Policy</a></p>
+                <p><a href="#" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">Cookie Policy</a></p>
+                <p><a href="#" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">Termini e condizioni</a></p>
+                <p><a href="#" style="color: var(--text-2); text-decoration: none; font-size: 13px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-2)'">Lavora con noi</a></p>
+            </div>
+        </div>
+        
+        <!-- Copyright centrale -->
+        <div style="text-align: center; padding-top: 20px; border-top: 1px solid var(--border);">
+            <p style="color: var(--text-3); font-size: 11px; margin: 0;">2025 FC Internazionale Milano - Tutti i diritti riservati</p>
+            <p style="color: var(--text-3); font-size: 10px; margin-top: 5px;">TicketFlow - Sistema di prenotazione ufficiale</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Cambia tutti i loghi sponsor in base al tema
+    function updateSponsorLogos() {
+        const isLightTheme = document.body.classList.contains('light-theme');
+         
+        // Lista di tutti i loghi con le loro versioni
+        const logos = [
+            { id: 'qatarLogo', white: '/images/qatar.webp', black: '/images/qatar-black.png' },
+            { id: 'nikeLogo', white: '/images/nike-white.png', black: '/images/nike.png' },
+            { id: 'pirelliLogo', white: '/images/pirelli-white.webp', black: '/images/pirelli.png' },
+            { id: 'efootball', white: '/images/konami-sponsor.webp', black: '/images/efootball-nero.png' },
+            { id: 'betssonLogo', white: '/images/betsson.webp', black: '/images/betsson-blackk.png' },
+            { id: 'bydLogo', white: '/images/byd.webp', black: '/images/byd-nero.png' },
+            { id: 'cocacola', white: '/images/coca.webp', black: '/images/coca-nero.png' }
+
+        ];
+        
+        logos.forEach(logo => {
+            const img = document.getElementById(logo.id);
+            if (img) {
+                if (isLightTheme) {
+                    img.src = logo.black;  // Logo nero per tema chiaro
+                } else {
+                    img.src = logo.white;  // Logo bianco per tema scuro
+                }
+            }
+        });
+    }
+    
+    // Esegui all'avvio
+    updateSponsorLogos();
+    
+    // Osserva i cambiamenti del tema
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                updateSponsorLogos();
+            }
+        });
+    });
+    
+    observer.observe(document.body, { attributes: true });
+</script>
