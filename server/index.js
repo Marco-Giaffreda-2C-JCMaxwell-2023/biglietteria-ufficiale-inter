@@ -37,13 +37,13 @@ const transporter = nodemailer.createTransport({
     port: 587,
     secure: false,
     auth: {
-        user: 'marcogiaffreda06@gmail.com',     
-        pass: 'vhcbijrfsbgfmjgm'            
+        user: process.env.EMAIL_USER || 'marcogiaffreda06@gmail.com',
+        pass: process.env.EMAIL_PASS || 'vhcbijrfsbgfmjgm'
     },
     tls: {
         rejectUnauthorized: false
     },
-    family: 4  // FORZA IPv4
+    family: 4
 });
 
 // Funzione per inviare email
@@ -301,7 +301,8 @@ async function generateTicketPDF(bookingData, seat, index, ticketHolder) {
     
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
@@ -379,7 +380,7 @@ async function sendTicketsByEmail(email, bookingData, seatsDetails, ticketHolder
 // ===================================================
 
 // ============ CONFIGURAZIONE BOT TELEGRAM ============
-const TELEGRAM_BOT_TOKEN = '8666591680:AAHi_jROhyylF41yJUL8H_c0sVoM4C1cIhI';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8666591680:AAHi_jROhyylF41yJUL8H_c0sVoM4C1cIhI';
 
 let bot;
 if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'IL_TUO_TOKEN_QUI') {
@@ -476,7 +477,7 @@ Grazie e buon divertimento! ⚽`;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('../client'));
+app.use(express.static(path.join(__dirname, '../client')));
 
 // Store connected clients
 const clients = new Map();
@@ -860,7 +861,7 @@ app.post('/api/forgot-password', async (req, res) => {
       );
     });
     
-    const resetLink = `http://localhost:3000/reset-password.html?token=${resetToken}`;
+    const resetLink = `${process.env.APP_URL || 'http://localhost:3000'}/reset-password.html?token=${resetToken}`;
     
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
@@ -942,7 +943,7 @@ app.post('/api/reset-password', async (req, res) => {
         <p>La tua password è stata aggiornata con successo!</p>
         <p>Se non hai effettuato tu questa modifica, contatta immediatamente il supporto.</p>
         <div style="text-align: center; margin: 20px 0;">
-          <a href="http://localhost:3000/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
+          <a href="${process.env.APP_URL || 'http://localhost:3000'}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
         </div>
         <p style="font-size: 12px; color: #666;">Grazie,<br>La Direzione.</p>
       </div>
@@ -993,7 +994,7 @@ app.post('/api/forgot-username', async (req, res) => {
         </div>
         <p>Puoi utilizzare questo username per accedere al tuo account.</p>
         <div style="text-align: center; margin: 20px 0;">
-          <a href="http://localhost:3000/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
+          <a href="${process.env.APP_URL || 'http://localhost:3000'}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
         </div>
         <hr style="margin: 20px 0;">
         <p style="font-size: 12px; color: #666;">Se non hai richiesto tu il recupero dell'username, ignora questo messaggio.</p>
