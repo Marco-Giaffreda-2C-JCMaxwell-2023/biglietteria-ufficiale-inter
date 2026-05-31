@@ -10,7 +10,7 @@ function initAdminWebSocket() {
     const token = localStorage.getItem('token');
     if (!token) return;
     
-    adminWs = new WebSocket(`ws://${window.location.host}`);
+adminWs = new WebSocket(`${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`);
     
     adminWs.onopen = () => {
         console.log('🔌 Admin WebSocket connected');
