@@ -34,16 +34,12 @@ const wss = new WebSocket.Server({ server });
 // ============ CONFIGURAZIONE NODEMAILER ============
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
     auth: {
         user: process.env.EMAIL_USER || 'marcogiaffreda06@gmail.com',
         pass: process.env.EMAIL_PASS || 'vhcbijrfsbgfmjgm'
-    },
-    tls: {
-        rejectUnauthorized: false
-    },
-    family: 4
+    }
 });
 
 // Funzione per inviare email
