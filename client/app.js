@@ -209,8 +209,7 @@ async function loadSeats(eventId) {
 
 // Initialize WebSocket connection
 function initWebSocket() {
-    ws = new WebSocket(`ws://${window.location.host}`);
-
+ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`);
     ws.onopen = () => {
         console.log('WebSocket connected');
         ws.send(JSON.stringify({
