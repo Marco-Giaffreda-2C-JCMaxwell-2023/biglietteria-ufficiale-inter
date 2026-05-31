@@ -11,7 +11,7 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 // ============ PER GENERARE PDF CON PUPPETEER ============
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
@@ -34,11 +34,14 @@ const wss = new WebSocket.Server({ server });
 // ============ CONFIGURAZIONE NODEMAILER ============
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
+    port: process.platform === 'win32' ? 587 : 465,
+    secure: process.platform !== 'win32',
     auth: {
         user: process.env.EMAIL_USER || 'marcogiaffreda06@gmail.com',
         pass: process.env.EMAIL_PASS || 'vhcbijrfsbgfmjgm'
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -296,10 +299,9 @@ async function generateTicketPDF(bookingData, seat, index, ticketHolder) {
     const html = generateTicketHTML(bookingData, seat, index, ticketHolder);
     
     const browser = await puppeteer.launch({
-    headless: true,
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || (process.platform === 'win32' ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' : '/usr/bin/chromium-browser'),
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-});
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     await page.pdf({
@@ -328,29 +330,22 @@ async function sendTicketsByEmail(email, bookingData, seatsDetails, ticketHolder
                 <img src="${getTeamLogo('inter')}" alt="Inter Milan" style="width: 60px; margin-bottom: 10px;">
                 <h2 style="color: #0c0d10; margin: 0;">FC Internazionale Milano</h2>
             </div>
-            
             <h3 style="color: #0c0d10; text-align: center;">Pagamento confermato! ✅</h3>
-            
             <p>Gentile <strong>${bookingData.username}</strong>,</p>
-            
             <p>Il tuo pagamento è stato completato con successo. <strong>In allegato trovi i biglietti</strong> per la partita:</p>
-            
             <div style="background: #f5f5f5; padding: 12px; border-radius: 8px; margin: 15px 0;">
                 <p style="margin: 5px 0;"><strong>🎟️ Partita:</strong> ${bookingData.event}</p>
                 <p style="margin: 5px 0;"><strong>📅 Data:</strong> ${bookingData.date}</p>
                 <p style="margin: 5px 0;"><strong>📍 Stadio:</strong> Giuseppe Meazza</p>
                 <p style="margin: 5px 0;"><strong>💰 Totale pagato:</strong> €${bookingData.totalAmount}</p>
             </div>
-            
             <p><strong>⚠️ IMPORTANTE:</strong></p>
             <ul style="margin: 10px 0; padding-left: 20px;">
                 <li>Presentati all'ingresso con un documento d'identità</li>
                 <li>I biglietti sono personali e non trasferibili</li>
                 <li>Arriva con almeno 30 minuti di anticipo</li>
             </ul>
-            
             <hr style="margin: 20px 0;">
-            
             <p style="font-size: 12px; color: #666; text-align: center;">La ringraziamo per l'acquisto!</p>
         </div>
     `;
@@ -376,7 +371,7 @@ async function sendTicketsByEmail(email, bookingData, seatsDetails, ticketHolder
 // ===================================================
 
 // ============ CONFIGURAZIONE BOT TELEGRAM ============
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8666591680:AAHi_jROhyylF41yJUL8H_c0sVoM4C1cIhI';
+const TELEGRAM_BOT_TOKEN = '8666591680:AAHi_jROhyylF41yJUL8H_c0sVoM4C1cIhI';
 
 let bot;
 if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'IL_TUO_TOKEN_QUI') {
@@ -473,7 +468,7 @@ Grazie e buon divertimento! ⚽`;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../client')));
+app.use(express.static('../client'));
 
 // Store connected clients
 const clients = new Map();
@@ -857,7 +852,7 @@ app.post('/api/forgot-password', async (req, res) => {
       );
     });
     
-    const resetLink = `${process.env.APP_URL || 'http://localhost:3000'}/reset-password.html?token=${resetToken}`;
+    const resetLink = `http://localhost:3000/reset-password.html?token=${resetToken}`;
     
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
@@ -939,7 +934,7 @@ app.post('/api/reset-password', async (req, res) => {
         <p>La tua password è stata aggiornata con successo!</p>
         <p>Se non hai effettuato tu questa modifica, contatta immediatamente il supporto.</p>
         <div style="text-align: center; margin: 20px 0;">
-          <a href="${process.env.APP_URL || 'http://localhost:3000'}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
+          <a href="http://localhost:3000/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
         </div>
         <p style="font-size: 12px; color: #666;">Grazie,<br>La Direzione.</p>
       </div>
@@ -990,7 +985,7 @@ app.post('/api/forgot-username', async (req, res) => {
         </div>
         <p>Puoi utilizzare questo username per accedere al tuo account.</p>
         <div style="text-align: center; margin: 20px 0;">
-          <a href="${process.env.APP_URL || 'http://localhost:3000'}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
+          <a href="http://localhost:3000/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
         </div>
         <hr style="margin: 20px 0;">
         <p style="font-size: 12px; color: #666;">Se non hai richiesto tu il recupero dell'username, ignora questo messaggio.</p>
