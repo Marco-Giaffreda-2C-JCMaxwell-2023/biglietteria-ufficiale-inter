@@ -16,7 +16,13 @@ const fs = require('fs');
 const path = require('path');
 
 // ============ AGGIUNTA PER TELEGRAM ============
-const TelegramBot = require('node-telegram-bot-api');
+// Su Railway il server non deve bloccarsi se Telegram non è configurato
+let TelegramBot = null;
+try {
+    TelegramBot = require('node-telegram-bot-api');
+} catch (error) {
+    console.log('⚠️ Modulo Telegram non installato: bot disattivato');
+}
 // ===============================================
 
 const db = require('./database');
@@ -31,14 +37,17 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// URL pubblico del sito: su Railway metti APP_URL nelle Variables
+const APP_URL = process.env.APP_URL || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : 'http://localhost:3000');
+
 // ============ CONFIGURAZIONE NODEMAILER ============
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: process.platform === 'win32' ? 587 : 465,
     secure: process.platform !== 'win32',
     auth: {
-        user: process.env.EMAIL_USER || 'marcogiaffreda06@gmail.com',
-        pass: process.env.EMAIL_PASS || 'password'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     },
     tls: {
         rejectUnauthorized: false
@@ -49,7 +58,7 @@ const transporter = nodemailer.createTransport({
 async function sendEmail(to, subject, html, attachments = []) {
     try {
         await transporter.sendMail({
-            from: `"Biglietteria Ufficiale Inter" <${process.env.EMAIL_USER || 'noreply@stadiomeazza.it'}>`,
+            from: `"Biglietteria Ufficiale Inter" <${process.env.EMAIL_USER}>`,
             to: to,
             subject: subject,
             html: html,
@@ -371,10 +380,10 @@ async function sendTicketsByEmail(email, bookingData, seatsDetails, ticketHolder
 // ===================================================
 
 // ============ CONFIGURAZIONE BOT TELEGRAM ============
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8666591680:AAHi_jROhyylF41yJUL8H_c0sVoM4C1cIhI';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
 let bot;
-if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== 'IL_TUO_TOKEN_QUI') {
+if (TELEGRAM_BOT_TOKEN && TelegramBot) {
     bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
     console.log('🤖 Bot Telegram inizializzato con successo!');
     
@@ -852,7 +861,7 @@ app.post('/api/forgot-password', async (req, res) => {
       );
     });
     
-    const resetLink = `${process.env.APP_URL || 'http://localhost:3000'}/reset-password.html?token=${resetToken}`;
+    const resetLink = `${APP_URL}/reset-password.html?token=${resetToken}`;
     
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
@@ -934,7 +943,7 @@ app.post('/api/reset-password', async (req, res) => {
         <p>La tua password è stata aggiornata con successo!</p>
         <p>Se non hai effettuato tu questa modifica, contatta immediatamente il supporto.</p>
         <div style="text-align: center; margin: 20px 0;">
-          <a href="${process.env.APP_URL || 'http://localhost:3000'}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
+          <a href="${APP_URL}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
         </div>
         <p style="font-size: 12px; color: #666;">Grazie,<br>La Direzione.</p>
       </div>
@@ -985,7 +994,7 @@ app.post('/api/forgot-username', async (req, res) => {
         </div>
         <p>Puoi utilizzare questo username per accedere al tuo account.</p>
         <div style="text-align: center; margin: 20px 0;">
-          <a href="${process.env.APP_URL || 'http://localhost:3000'}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
+          <a href="${APP_URL}/login.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">Accedi ora</a>
         </div>
         <hr style="margin: 20px 0;">
         <p style="font-size: 12px; color: #666;">Se non hai richiesto tu il recupero dell'username, ignora questo messaggio.</p>
